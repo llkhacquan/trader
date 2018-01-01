@@ -1,8 +1,13 @@
 package vn.quannk.bittextrade;
+
 import com.github.lyhnx.bittrexapiwrapper.api.AccountApi;
 import com.github.lyhnx.bittrexapiwrapper.api.ApiKey;
 import com.github.lyhnx.bittrexapiwrapper.api.MarketApi;
 import com.github.lyhnx.bittrexapiwrapper.api.PublicApi;
+import com.github.lyhnx.bittrexapiwrapper.api.models.Market;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Runner {
 
@@ -15,7 +20,20 @@ public class Runner {
     private static final MarketApi marketApi = new MarketApi(apiKey);
     private static final AccountApi accountApi = new AccountApi(apiKey);
 
-    public static void main(String args[]) {
-        System.out.println("Test key readInfo " + Utils.testReadInfoKey(apiKey));
+    public static void main(String args[]) throws InterruptedException {
+        List<String> coins = new ArrayList<>();
+        Market[] markets = publicApi.getMarkets();
+        for (Market market : markets) {
+            if (market.getBaseCurrency().equalsIgnoreCase("ETH") && !market.getMarketCurrency().equalsIgnoreCase("BTC")) {
+                coins.add(market.getMarketCurrency());
+            }
+        }
+        while (true) {
+            for (String coin : coins) {
+                Utils.checkMarket("BTC", "ETH", coin);
+            }
+            Thread.sleep(1000);
+            System.out.println("Rerun");
+        }
     }
 }
